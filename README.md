@@ -2,7 +2,7 @@
 
 **DISCLAIMER!!!: THIS APP IS STILL IN ITS EARLY DEVELOPMENT AND HAS NOT BEEN AUDITED FOR SECURITY, SO USE AT YOUR OWN RISK!**
 
-# TigerChat
+# TigerChat (https://scripttiger.github.io/tigerchat/)
 TigerChat is a simple peer-to-peer/full-mesh chat app written in Go and transpiled to JavaScript via GopherJS. Every connection is inherently encypted by WebRTC, and every peer must successfully perform a three-way cryptographic challenge-response handshake using Argon2 with each of the other peers in order to be authenticated with each other. However, while this provides reasonable security for fun chats amongst friends, it's not intended for the transmission of highly sensitive data.
 
 If you are experiencing difficulties connecting to peers, TigerChat is also easily configurable for TURN in cases where your network may be preventing you from establishing peer-to-peer connections. However, while TURN may relay your traffic similarly to a proxy, it should be noted that using TURN does not make you anonymous. The point of TURN is to faciliate real-time communications in instances where peer-to-peer connections cannot be established, not to provide anonymity.
