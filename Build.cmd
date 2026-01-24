@@ -17,7 +17,7 @@ set GOOS=js
 set GOARCH=ecmascript
 call gopherjs build -o ../Release/%app%.js
 echo Minifying JS...
-call npx terser ../Release/%app%.js -c -m -o ../Release/%app%.m.js
+call npx terser ../Release/%app%.js -c -m -o ../Release/%app%.min.js
 
 :html
 if not exist ..\Release\index.html (
