@@ -204,9 +204,11 @@ func main() {
 			if turnUrl != "T" && turnUser != "T" && turnCred != "T" {
 				turnSettingsStr = "&turnurl="+turnUrl+"&turnuser="+turnUser+"&turncred="+turnCred+"&policy="+policy
 			}
+			url := jsGo.URL.New(jsGo.Location.Get("href"))
+			url.Set("search", "")
 			jsGo.Location.Set(
 				"href",
-				jsGo.Location.Get("origin").String()+"?room="+room+"&name="+name+"&password="+password+turnSettingsStr,
+				url.Call("toString").String()+"?room="+room+"&name="+name+"&password="+password+turnSettingsStr,
 			)
 		}))
 		appAppendChild(form)

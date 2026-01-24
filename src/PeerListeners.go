@@ -48,7 +48,9 @@ func addPeerListeners() {
 		}
 
 		// Share link for share button and QR code
-		shareLink := jsGo.Location.Get("origin").String()+"?room="+stringToUrl(room)+"&password="+stringToUrl(password)
+		url := jsGo.URL.New(jsGo.Location.Get("href"))
+		url.Set("search", "")
+		shareLink := url.Call("toString").String()+"?room="+stringToUrl(room)+"&password="+stringToUrl(password)
 
 		// Share button to copy share link to clipboard
 		if shareButton.IsUndefined() {
