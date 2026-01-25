@@ -49,7 +49,7 @@ func stringToUrl(str string) (string) {
 	return "T"+jsGo.String.New(jsGo.String.New(jsGo.String.New(jsGo.Btoa(str)).Call("replaceAll", "=", "")).Call("replaceAll", "+", "-")).Call("replaceAll", "/", "_").String()
 }
 
-// Decade a base64 URL-safe string back to a regular string
+// Decode a base64 URL-safe string back to a regular string
 func urlToString(str string) (string) {
 	return jsGo.Atob(jsGo.String.New(jsGo.String.New(jsGo.String.New(str).Call("replaceAll", "-", "+")).Call("replaceAll", "_", "/")).Call("substring", 1)).String()
 }
