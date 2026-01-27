@@ -20,7 +20,7 @@ func appPrepend(child js.Value) {app.Call("prepend", child)}
 // Messaging functions
 
 // Append a message to the chat history
-func chat(msg string) {
+func chat(msg any) {
 	chatArea.Call("append", msg)
 	chatArea.Call("appendChild", jsGo.CreateElement("br"))
 }
@@ -36,10 +36,25 @@ func sendAll(msg any) {
 func sendAllText() {
 	msg := textArea.Get("value")
 	if msg.String() != "" {
-		sendAll(msg)
+		sendAll(map[string]any{"text": msg})
 		chat("Me: "+msg.String())
 		textArea.Set("value", nil)
 	}
+}
+
+// Send an image file to all peers and append it to your own chat history
+func sendAllImage(file js.Value) {
+	jsGo.ThenableChain(
+		file.Call("arrayBuffer"),
+		func(arrayBuffer js.Value) (any) {
+			sendAll(map[string]any{"image": jsGo.Array.New(arrayBuffer)})
+			return nil
+		},
+	)
+	img := jsGo.CreateElement("img")
+	img.Set("src", jsGo.URL.Call("createObjectURL", file))
+	chat("Me: ")
+	chat(img)
 }
 
 // Query string functions

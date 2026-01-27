@@ -37,8 +37,8 @@ func addPeerListeners() {
 				}
 				connected = false
 				destroyed = true
-				conns = [32]js.Value{}
-				verified = [32]bool{}
+				conns = [roomMax]js.Value{}
+				verified = [roomMax]bool{}
 				peer.Call("disconnect")
 				peer.Call("destroy")
 				app.Set("innerHTML", nil)

@@ -76,9 +76,19 @@ func addConnListeners(conn js.Value, connID int, initiator bool, salt string) {
 									"msg": "name-request",
 									"name": name,
 								}})
+
+								// Announce new verified connection to all peers
+								sendAll(map[string]any{"metadata": map[string]any{
+									"msg": "intro",
+									"id": connID,
+								}})
+
+							// Close connection by default
 							} else {conn.Call("close")}
 							return nil
 						})
+
+					// Close connection by default
 					default:
 						conn.Call("close")
 				}
@@ -94,12 +104,6 @@ func addConnListeners(conn js.Value, connID int, initiator bool, salt string) {
 						conn.Call("send", map[string]any{"metadata": map[string]any{
 							"msg": "name-response",
 							"name": name,
-						}})
-
-						// Announce new verified connection to all peers
-						sendAll(map[string]any{"metadata": map[string]any{
-							"msg": "intro",
-							"id": connID,
 						}})
 
 					// Receive initiator's name and announce them in chat history
@@ -118,8 +122,22 @@ func addConnListeners(conn js.Value, connID int, initiator bool, salt string) {
 				}
 			}
 
-		// Announce messages from verified connections which are not metadata to the chat history
-		} else if verified[connID] {chat(connName+": "+data[0].String())
+		// Handle data messages from verified connections
+		} else if verified[connID] {
+
+			// Append text messages to the chat history
+			if jsGo.HasOwn(data[0], "text") {
+				chat(connName+": "+data[0].Get("text").String())
+
+			// Append received images to the chat history
+			} else if jsGo.HasOwn(data[0], "image") {
+				img := jsGo.CreateElement("img")
+				img.Set("src", jsGo.URL.Call("createObjectURL", jsGo.Blob.New(data[0].Get("image"))))
+				chat(connName+": ")
+				chat(img)
+
+			// Close connection by default
+			} else {conn.Call("close")}
 
 		// Close connection by default
 		} else {conn.Call("close")}
@@ -143,18 +161,31 @@ func addConnListeners(conn js.Value, connID int, initiator bool, salt string) {
 			})
 		}
 
-		// Send button to trigger text being sent to all peers as well as chat history, and clearing text
-		if sendButton.IsUndefined() {
+		// Set up chat elements if not set up already
+		if fileButton.IsUndefined() {
+
+			// Three-line break between chat elements and leave button
 			appPrepend(jsGo.CreateElement("br"))
 			appPrepend(jsGo.CreateElement("br"))
 			appPrepend(jsGo.CreateElement("br"))
+
+			// File button to send files
+			fileButton = jsGo.CreateLoadFileButton("Image", "image/*", false, func(event js.Value) {
+				file := event.Get("target").Get("files").Index(0)
+				if jsGo.String.New(file.Get("type")).Call("split", "/", 1).Index(0).String() == "image" {
+					sendAllImage(file)
+				} else {
+					jsGo.Alert("You may only send valid image files at this time!")
+				}
+			})
+			appPrepend(fileButton)
+
+			// Send button to trigger text being sent to all peers as well as chat history, and clearing text
 			sendButton = jsGo.CreateButton("Send", func() {sendAllText()})
 			appPrepend(sendButton)
 			appPrepend(jsGo.CreateElement("br"))
-		}
 
-		// Text area to type messages which will be sent to peers
-		if textArea.IsUndefined() {
+			// Text area to type messages which will be sent to peers
 			appAppendChild(jsGo.CreateElement("br"))
 			textArea = jsGo.CreateElement("textarea")
 			textArea.Set("style", "resize: none;")
@@ -165,10 +196,8 @@ func addConnListeners(conn js.Value, connID int, initiator bool, salt string) {
 				}
 			}))
 			appPrepend(textArea)
-		}
 
-		// Chat history
-		if chatArea.IsUndefined() {
+			// Chat history
 			chatArea = jsGo.CreateElement("div")
 			appPrepend(chatArea)
 		}

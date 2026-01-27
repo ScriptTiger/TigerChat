@@ -13,7 +13,7 @@ const (
 	appName = "TigerChat"
 
 	// Maximum connections per room
-	roomMax = 32
+	roomMax = 8
 )
 
 var (
@@ -24,7 +24,9 @@ var (
 	connected, destroyed bool
 
 	// Global JS objects
-	app, peer, chatArea, textArea, sendButton, leaveButton, shareButton, qrCode js.Value
+	app, peer,
+	chatArea, textArea, sendButton, fileButton,
+	leaveButton, shareButton, qrCode js.Value
 
 	// Room management
 	roomID, nextTry int

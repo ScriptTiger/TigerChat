@@ -7,8 +7,6 @@ rem set GOPHERJS_GOROOT=C:\path-to-gopherjs-goroot
 
 set app=TigerChat
 
-if not exist Release md Release
-
 cd src
 
 :ecmascript
