@@ -10,7 +10,7 @@ import (
 
 // Generate a salt, which will be used as a challenge and hashed together with the password using Argon2
 func generateSalt() (string) {
-	salt := jsGo.Get("Uint8Array").New(16)
+	salt := jsGo.Uint8Array.New(16)
 	jsGo.Crypto.Call("getRandomValues", salt)
 	return salt.Call("toHex").String()
 }
@@ -19,6 +19,6 @@ func generateSalt() (string) {
 func argon2(salt, password string) (promise js.Value) {
 	return jsGo.Get("argon2").Call("hash", map[string]any{
 		"pass": password,
-		"salt": jsGo.Get("Uint8Array").Call("fromHex", salt).String(),
+		"salt": jsGo.Uint8Array.Call("fromHex", salt).String(),
 	})
 }
