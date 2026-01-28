@@ -63,6 +63,7 @@ func main() {
 	// Capture URL
 	url := jsGo.URL.New(jsGo.Location.Get("href"))
 	urlRaw = url.Call("toString").String()
+	jsGo.Log("Full URL (THIS URL CONTAINS ALL OF YOUR TIGERCHAT SETTINGS, SO USE AT YOUR OWN RISK): "+urlRaw)
 	url.Set("search", "")
 	urlClean = url.Call("toString").String()
 
