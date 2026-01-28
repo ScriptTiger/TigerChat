@@ -29,8 +29,10 @@ func addPeerListeners() {
 		jsGo.Document.Set("title", appName+" - "+room)
 		app.Set("innerHTML", nil)
 
-		// Leave button to disconnect from everything and destroy peer object
+		// Set up footer elements if not set up already
 		if leaveButton.IsUndefined() {
+
+			// Leave button to disconnect from everything and destroy peer object
 			leaveButton = jsGo.CreateButton("Leave chat", func() {
 				for i, _ := range conns {
 					if !conns[i].IsUndefined() {conns[i].Call("close")}
@@ -45,21 +47,17 @@ func addPeerListeners() {
 				appAppendChild(jsGo.CreateButton("Re-enter chat", func() {jsGo.Location.Set("href", urlRaw)}))
 			})
 			appAppendChild(leaveButton)
-		}
 
-		// Share link for share button and QR code
-		shareLink := urlClean+"?room="+stringToUrl(room)+"&password="+stringToUrl(password)
+			// Share link for share button and QR code
+			shareLink := urlClean+"?room="+stringToUrl(room)+"&password="+stringToUrl(password)
 
-		// Share button to copy share link to clipboard
-		if shareButton.IsUndefined() {
+			// Share button to copy share link to clipboard
 			shareButton = jsGo.CreateButton("Copy share link", func() {
 				jsGo.Get("navigator").Get("clipboard").Call("writeText", shareLink)
 			})
 			appAppendChild(shareButton)
-		}
 
-		// Display QR code with share link
-		if qrCode.IsUndefined() {
+			// Display QR code with share link
 			qrCode = jsGo.CreateElement("div")
 			appAppendChild(qrCode)
 			jsGo.Get("QRCode").New(qrCode, shareLink)
