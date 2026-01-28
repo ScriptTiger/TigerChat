@@ -17,8 +17,8 @@ const (
 )
 
 var (
-	// Query strings
-	room, name, password, turnUrl, turnUser, turnCred, policy string
+	// Location elements
+	urlRaw, urlClean, room, name, password, turnUrl, turnUser, turnCred, policy string
 
 	// Status tracking of the signalling server
 	connected, destroyed bool
@@ -59,6 +59,15 @@ func main() {
 	if hasTurnUser {turnUser = urlToString(jsGo.Params.Call("get", "turnuser").String())}
 	if hasTurnCred {turnCred = urlToString(jsGo.Params.Call("get", "turncred").String())}
 	if hasPolicy {policy = urlToString(jsGo.Params.Call("get", "policy").String())}
+
+	// Capture URL
+	url := jsGo.URL.New(jsGo.Location.Get("href"))
+	urlRaw = url.Call("toString").String()
+	url.Set("search", "")
+	urlClean = url.Call("toString").String()
+
+	// Wipe current query strings without reloading
+	jsGo.History.Call("replaceState", nil, nil, urlClean)
 
 	// If the room, name, and password are not all given, present the user with input fields to input the needed information
 	if !(hasRoom && hasName && hasPassword) {
@@ -206,11 +215,9 @@ func main() {
 			if turnUrl != "T" && turnUser != "T" && turnCred != "T" {
 				turnSettingsStr = "&turnurl="+turnUrl+"&turnuser="+turnUser+"&turncred="+turnCred+"&policy="+policy
 			}
-			url := jsGo.URL.New(jsGo.Location.Get("href"))
-			url.Set("search", "")
 			jsGo.Location.Set(
 				"href",
-				url.Call("toString").String()+"?room="+room+"&name="+name+"&password="+password+turnSettingsStr,
+				urlClean+"?room="+room+"&name="+name+"&password="+password+turnSettingsStr,
 			)
 		}))
 		appAppendChild(form)

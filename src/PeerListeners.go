@@ -42,23 +42,18 @@ func addPeerListeners() {
 				peer.Call("disconnect")
 				peer.Call("destroy")
 				app.Set("innerHTML", nil)
-				appAppendChild(jsGo.CreateButton("Re-enter chat", func() {jsGo.Location.Call("reload")}))
+				appAppendChild(jsGo.CreateButton("Re-enter chat", func() {jsGo.Location.Set("href", urlRaw)}))
 			})
 			appAppendChild(leaveButton)
 		}
 
 		// Share link for share button and QR code
-		url := jsGo.URL.New(jsGo.Location.Get("href"))
-		url.Set("search", "")
-		shareLink := url.Call("toString").String()+"?room="+stringToUrl(room)+"&password="+stringToUrl(password)
+		shareLink := urlClean+"?room="+stringToUrl(room)+"&password="+stringToUrl(password)
 
 		// Share button to copy share link to clipboard
 		if shareButton.IsUndefined() {
 			shareButton = jsGo.CreateButton("Copy share link", func() {
-				jsGo.Get("navigator").Get("clipboard").Call(
-					"writeText",
-					shareLink,
-				)
+				jsGo.Get("navigator").Get("clipboard").Call("writeText", shareLink)
 			})
 			appAppendChild(shareButton)
 		}
