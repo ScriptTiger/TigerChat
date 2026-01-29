@@ -21,7 +21,8 @@ var (
 	urlRaw, urlClean, room, name, password, turnUrl, turnUser, turnCred, policy string
 
 	// Status tracking of the signaling server
-	connected, destroyed bool
+	connected bool
+	destroyed = true
 
 	// Global JS objects
 	app, peer,
