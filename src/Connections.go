@@ -100,7 +100,7 @@ func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
 					// Receive name from receiver, announce them in chat history, and reply with initiator's name
 					case "name-request":
 						connName = metadata.Get("name").String()
-						if fileButton.IsUndefined() {addChat()}
+						if !hasChat {addChat()}
 						chat(connName+" has entered the chat")
 						conn.Call("send", map[string]any{"metadata": map[string]any{
 							"msg": "name-response",
@@ -110,7 +110,7 @@ func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
 					// Receive initiator's name and announce them in chat history
 					case "name-response":
 						connName = metadata.Get("name").String()
-						if fileButton.IsUndefined() {addChat()}
+						if !hasChat {addChat()}
 						chat(connName+" has entered the chat")
 
 					// Receive announcement of new peer and initiate connection with that new peer

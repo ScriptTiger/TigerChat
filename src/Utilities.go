@@ -21,7 +21,10 @@ func appPrepend(child js.Value) {app.Call("prepend", child)}
 
 // Set up chat elements if not set up already
 func addChat() {
-	if fileButton.IsUndefined() {
+	if !hasChat {
+
+		// Update status
+		hasChat = true
 
 		// Three-line break between chat elements and leave button
 		appPrepend(jsGo.CreateElement("br"))
@@ -29,19 +32,19 @@ func addChat() {
 		appPrepend(jsGo.CreateElement("br"))
 
 		// File button to send files
-		fileButton = jsGo.CreateLoadFileButton("Image", ".jpg, .jpeg, image/jpeg, .png, image/png, .gif, image/gif", false, func(event js.Value) {
-			file := event.Get("target").Get("files").Index(0)
-			if jsGo.String.New(file.Get("type")).Call("split", "/", 1).Index(0).String() == "image" {
-				sendAllImage(file)
-			} else {
-				jsGo.Alert("You may only send valid image files at this time!")
-			}
-		})
-		appPrepend(fileButton)
+		appPrepend(
+			jsGo.CreateLoadFileButton("Image", ".jpg, .jpeg, image/jpeg, .png, image/png, .gif, image/gif", false, func(event js.Value) {
+				file := event.Get("target").Get("files").Index(0)
+				if jsGo.String.New(file.Get("type")).Call("split", "/", 1).Index(0).String() == "image" {
+					sendAllImage(file)
+				} else {
+					jsGo.Alert("You may only send valid image files at this time!")
+				}
+			}),
+		)
 
 		// Send button to trigger text being sent to all peers as well as chat history, and clearing text
-		sendButton = jsGo.CreateButton("Send", func() {sendAllText()})
-		appPrepend(sendButton)
+		appPrepend(jsGo.CreateButton("Send", func() {sendAllText()}))
 		appPrepend(jsGo.CreateElement("br"))
 
 		// Text area to type messages which will be sent to peers

@@ -21,13 +21,13 @@ var (
 	urlRaw, urlClean, room, name, password, turnUrl, turnUser, turnCred, policy string
 
 	// Status tracking of the signaling server
-	connected bool
+	hasChat, hasFooter, connected bool
 	destroyed = true
 
 	// Global JS objects
 	app, peer,
-	chatArea, textArea, sendButton, fileButton,
-	leaveButton, shareButton, qrCode js.Value
+	chatArea, textArea,
+	qrCode js.Value
 
 	// Room management
 	roomID, nextTry int

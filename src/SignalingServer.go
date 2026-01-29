@@ -33,32 +33,34 @@ func peerHandler() {
 		app.Set("innerHTML", nil)
 
 		// Set up footer elements if not set up already
-		if leaveButton.IsUndefined() {
+		if !hasFooter {
 
 			// Leave button to disconnect from everything and destroy peer object
-			leaveButton = jsGo.CreateButton("Leave chat", func() {
-				for i, _ := range conns {
-					if !conns[i].IsUndefined() {conns[i].Call("close")}
-				}
-				connected = false
-				destroyed = true
-				conns = [roomMax]js.Value{}
-				verified = [roomMax]bool{}
-				peer.Call("disconnect")
-				peer.Call("destroy")
-				app.Set("innerHTML", nil)
-				appAppendChild(jsGo.CreateButton("Re-enter chat", func() {jsGo.Location.Set("href", urlRaw)}))
-			})
-			appAppendChild(leaveButton)
+			appAppendChild(
+				jsGo.CreateButton("Leave chat", func() {
+					for i, _ := range conns {
+						if !conns[i].IsUndefined() {conns[i].Call("close")}
+					}
+					connected = false
+					destroyed = true
+					conns = [roomMax]js.Value{}
+					verified = [roomMax]bool{}
+					peer.Call("disconnect")
+					peer.Call("destroy")
+					app.Set("innerHTML", nil)
+					appAppendChild(jsGo.CreateButton("Re-enter chat", func() {jsGo.Location.Set("href", urlRaw)}))
+				}),
+			)
 
 			// Share link for share button and QR code
 			shareLink := urlClean+"?room="+stringToUrl(room)+"&password="+stringToUrl(password)
 
 			// Share button to copy share link to clipboard
-			shareButton = jsGo.CreateButton("Copy share link", func() {
-				jsGo.Get("navigator").Get("clipboard").Call("writeText", shareLink)
-			})
-			appAppendChild(shareButton)
+			appAppendChild(
+				jsGo.CreateButton("Copy share link", func() {
+					jsGo.Get("navigator").Get("clipboard").Call("writeText", shareLink)
+				}),
+			)
 
 			// Display QR code with share link
 			qrCode = jsGo.CreateElement("div")
