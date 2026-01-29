@@ -20,7 +20,7 @@ var (
 	// Location elements
 	urlRaw, urlClean, room, name, password, turnUrl, turnUser, turnCred, policy string
 
-	// Status tracking of the signalling server
+	// Status tracking of the signaling server
 	connected, destroyed bool
 
 	// Global JS objects
@@ -227,16 +227,11 @@ func main() {
 		return
 	}
 
-	// Load required JS libraries and begin attempting to connect to the signalling server
+	// Load required JS libraries and begin attempting to connect to the signaling server
 	jsGo.LoadJS("https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js", func() {
 		jsGo.LoadJS("https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/dist/argon2-bundled.min.js", func() {
 			jsGo.LoadJS("https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js", func() {
-
-				// Attempt to connect to signalling server
-				peer = jsGo.Get("Peer").New(stringToUrl(room)+"0", getOptions())
-
-				// Create listeners to make the rest of the application logic event-driven
-				addPeerListeners()
+				peerHandler()
 			})
 		})
 	})

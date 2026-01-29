@@ -9,9 +9,9 @@ import (
 )
 
 // Add listeners for connection events
-func addConnListeners(conn js.Value, connID int, initiator bool, salt string) {
+func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
 
-	// Cancel if connection to signalling server is currently disconnected or destroyed
+	// Cancel if connection to signaling server is currently disconnected or destroyed
 	if !connected || destroyed {return}
 
 	// Connection name, given by peer

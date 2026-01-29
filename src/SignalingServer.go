@@ -8,8 +8,11 @@ import (
 	"github.com/ScriptTiger/jsGo"
 )
 
-// Add listeners for events from signalling server
-func addPeerListeners() {
+// Add listeners for events from signaling server
+func peerHandler() {
+
+	// Attempt connecting to signaling server with specific peer ID within room
+	peer = jsGo.Get("Peer").New(stringToUrl(room)+jsGo.String.Invoke(roomID).String(), getOptions())
 
 	// Update status
 	connected = false
@@ -73,7 +76,7 @@ func addPeerListeners() {
 		if jsGo.String.New(conn[0].Get("peer")).Call("substring", 0, len(stringToUrl(room))).String() == stringToUrl(room) {
 			connID := jsGo.ParseInt(jsGo.String.New(conn[0].Get("peer")).Call("substring", len(stringToUrl(room)))).Int()
 			if !connected {conn[0].Call("close")
-			} else {addConnListeners(conn[0], connID, false, metadata.Get("challenge").String())}
+			} else {connectionHandler(conn[0], connID, false, metadata.Get("challenge").String())}
 		} else {conn[0].Call("close")}
 	}))
 
@@ -102,8 +105,7 @@ func addPeerListeners() {
 				destroyed = true
 				if roomID == roomMax-1 {exit("This room is already full!")}
 				roomID++
-				peer = jsGo.Get("Peer").New(stringToUrl(room)+jsGo.String.Invoke(roomID).String(), getOptions())
-				addPeerListeners()
+				peerHandler()
 
 			// If no peer is found in the room at the given ID, wait a period of time before trying to connect to the next ID
 			case "peer-unavailable":

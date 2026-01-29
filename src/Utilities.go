@@ -107,7 +107,7 @@ func connect(id int) {
 		peerID,
 		map[string]any{"metadata": map[string]any{"challenge": salt}},
 	)
-	addConnListeners(conn, id, true, salt)
+	connectionHandler(conn, id, true, salt)
 }
 
 // Scan for available peers in a room
