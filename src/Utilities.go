@@ -19,6 +19,49 @@ func appPrepend(child js.Value) {app.Call("prepend", child)}
 
 // Messaging functions
 
+// Set up chat elements if not set up already
+func addChat() {
+	if fileButton.IsUndefined() {
+
+		// Three-line break between chat elements and leave button
+		appPrepend(jsGo.CreateElement("br"))
+		appPrepend(jsGo.CreateElement("br"))
+		appPrepend(jsGo.CreateElement("br"))
+
+		// File button to send files
+		fileButton = jsGo.CreateLoadFileButton("Image", ".jpg, .jpeg, image/jpeg, .png, image/png, .gif, image/gif", false, func(event js.Value) {
+			file := event.Get("target").Get("files").Index(0)
+			if jsGo.String.New(file.Get("type")).Call("split", "/", 1).Index(0).String() == "image" {
+				sendAllImage(file)
+			} else {
+				jsGo.Alert("You may only send valid image files at this time!")
+			}
+		})
+		appPrepend(fileButton)
+
+		// Send button to trigger text being sent to all peers as well as chat history, and clearing text
+		sendButton = jsGo.CreateButton("Send", func() {sendAllText()})
+		appPrepend(sendButton)
+		appPrepend(jsGo.CreateElement("br"))
+
+		// Text area to type messages which will be sent to peers
+		appAppendChild(jsGo.CreateElement("br"))
+		textArea = jsGo.CreateElement("textarea")
+		textArea.Set("style", "resize: none;")
+		textArea.Call("addEventListener", "keydown", jsGo.ProcOf(func(event []js.Value) {
+			if event[0].Get("key").String() == "Enter" {
+				event[0].Call("preventDefault")
+				sendAllText()
+			}
+		}))
+		appPrepend(textArea)
+
+		// Chat history
+		chatArea = jsGo.CreateElement("div")
+		appPrepend(chatArea)
+	}
+}
+
 // Append a message to the chat history
 func chat(msg any) {
 	chatArea.Call("append", msg)

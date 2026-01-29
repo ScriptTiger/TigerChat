@@ -100,6 +100,7 @@ func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
 					// Receive name from receiver, announce them in chat history, and reply with initiator's name
 					case "name-request":
 						connName = metadata.Get("name").String()
+						if fileButton.IsUndefined() {addChat()}
 						chat(connName+" has entered the chat")
 						conn.Call("send", map[string]any{"metadata": map[string]any{
 							"msg": "name-response",
@@ -109,6 +110,7 @@ func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
 					// Receive initiator's name and announce them in chat history
 					case "name-response":
 						connName = metadata.Get("name").String()
+						if fileButton.IsUndefined() {addChat()}
 						chat(connName+" has entered the chat")
 
 					// Receive announcement of new peer and initiate connection with that new peer
@@ -160,48 +162,6 @@ func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
 				return nil
 			})
 		}
-
-		// Set up chat elements if not set up already
-		if fileButton.IsUndefined() {
-
-			// Three-line break between chat elements and leave button
-			appPrepend(jsGo.CreateElement("br"))
-			appPrepend(jsGo.CreateElement("br"))
-			appPrepend(jsGo.CreateElement("br"))
-
-			// File button to send files
-			fileButton = jsGo.CreateLoadFileButton("Image", ".jpg, .jpeg, image/jpeg, .png, image/png, .gif, image/gif", false, func(event js.Value) {
-				file := event.Get("target").Get("files").Index(0)
-				if jsGo.String.New(file.Get("type")).Call("split", "/", 1).Index(0).String() == "image" {
-					sendAllImage(file)
-				} else {
-					jsGo.Alert("You may only send valid image files at this time!")
-				}
-			})
-			appPrepend(fileButton)
-
-			// Send button to trigger text being sent to all peers as well as chat history, and clearing text
-			sendButton = jsGo.CreateButton("Send", func() {sendAllText()})
-			appPrepend(sendButton)
-			appPrepend(jsGo.CreateElement("br"))
-
-			// Text area to type messages which will be sent to peers
-			appAppendChild(jsGo.CreateElement("br"))
-			textArea = jsGo.CreateElement("textarea")
-			textArea.Set("style", "resize: none;")
-			textArea.Call("addEventListener", "keydown", jsGo.ProcOf(func(event []js.Value) {
-				if event[0].Get("key").String() == "Enter" {
-					event[0].Call("preventDefault")
-					sendAllText()
-				}
-			}))
-			appPrepend(textArea)
-
-			// Chat history
-			chatArea = jsGo.CreateElement("div")
-			appPrepend(chatArea)
-		}
-
 	}))
 
 	// Close
