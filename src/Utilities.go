@@ -31,10 +31,10 @@ func addChat() {
 		appPrepend(jsGo.CreateElement("br"))
 		appPrepend(jsGo.CreateElement("br"))
 
-		// File button to send files
+		// Image button to send images
 		appPrepend(
-			jsGo.CreateLoadFileButton("Image", ".jpg, .jpeg, image/jpeg, .png, image/png, .gif, image/gif", false, func(event js.Value) {
-				file := event.Get("target").Get("files").Index(0)
+			jsGo.CreateLoadFileButton("Image", ".jpg, .jpeg, image/jpeg, .png, image/png, .gif, image/gif", false, func(files js.Value) {
+				file := files.Index(0)
 				if jsGo.String.New(file.Get("type")).Call("split", "/", 1).Index(0).String() == "image" {
 					sendAllImage(file)
 				} else {
