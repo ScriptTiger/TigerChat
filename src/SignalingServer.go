@@ -28,12 +28,12 @@ func peerHandler() {
 		// Begin scanning for peeers
 		scan(true)
 
-		// Set up page
-		jsGo.Document.Set("title", appName+" - "+room)
-		app.Set("innerHTML", nil)
-
 		// Set up footer elements if not set up already
 		if !hasFooter {
+
+			// Set up page
+			jsGo.Document.Set("title", appName+" - "+room)
+			app.Set("innerHTML", nil)
 
 			// Leave button to disconnect from everything and destroy peer object
 			appAppendChild(
@@ -90,6 +90,10 @@ func peerHandler() {
 
 	// Disconnected
 	peer.Call("on", "disconnected", jsGo.SimpleProcOf(func() {
+
+		// Update status
+		connected = false
+
 		if !destroyed {peer.Call("reconnect")
 		} else {connected = false}
 	}))
