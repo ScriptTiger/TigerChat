@@ -113,10 +113,13 @@ func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
 						if !hasChat {addChat()}
 						chat(connName+" has entered the chat")
 
-					// Receive announcement of new peer and initiate connection with that new peer
+					// Receive announcement of new peer and initiate connection with that new peer after a random interval of time between 0 and 5 seconds
 					case "intro":
 						connID := metadata.Get("id").Int()
-						if roomID != connID && conns[connID].IsUndefined() {connect(connID)}
+						connectTimer := jsGo.Math.Call("floor", jsGo.Math.Call("random").Float()*5001)
+						jsGo.SetTimeout(jsGo.SimpleProcOf(func() {
+							if roomID != connID && conns[connID].IsUndefined() {connect(connID)}
+						}), connectTimer)
 
 					// Close connection by default
 					default:
