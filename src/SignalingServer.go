@@ -77,8 +77,17 @@ func peerHandler() {
 		// Verify the incomming connection request is from a peer in the same room before accepting request, and close if not
 		if jsGo.String.New(conn[0].Get("peer")).Call("substring", 0, len(stringToUrl(room))).String() == stringToUrl(room) {
 			connID := jsGo.ParseInt(jsGo.String.New(conn[0].Get("peer")).Call("substring", len(stringToUrl(room)))).Int()
+
+			// If the incoming peer ID is the same as an existing one, remove the existing one
+			var reconnect bool
+			if !conns[connID].IsUndefined() {
+				reconnect = true
+				conns[connID].Call("close")
+				conns[connID] = js.Undefined()
+				verified[connID] = false
+			}
 			if !connected {conn[0].Call("close")
-			} else {connectionHandler(conn[0], connID, false, metadata.Get("challenge").String())}
+			} else {connectionHandler(conn[0], connID, false, reconnect, metadata.Get("challenge").String())}
 		} else {conn[0].Call("close")}
 	}))
 

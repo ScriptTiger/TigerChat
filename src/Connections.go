@@ -9,7 +9,7 @@ import (
 )
 
 // Add listeners for connection events
-func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
+func connectionHandler(conn js.Value, connID int, initiator, reconnect bool, salt string) {
 
 	// Cancel if connection to signaling server is currently disconnected or destroyed
 	if !connected || destroyed {return}
@@ -81,6 +81,7 @@ func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
 								sendAll(map[string]any{"metadata": map[string]any{
 									"msg": "intro",
 									"id": connID,
+									"reconnect": reconnect,
 								}})
 
 							// Close connection by default
@@ -116,6 +117,11 @@ func connectionHandler(conn js.Value, connID int, initiator bool, salt string) {
 					// Receive announcement of new peer and initiate connection with that new peer after a random interval of time between 0 and 5 seconds
 					case "intro":
 						connID := metadata.Get("id").Int()
+						if !conns[connID].IsUndefined() && metadata.Get("reconnect").Bool() {
+							conns[connID].Call("close")
+							conns[connID] = js.Undefined()
+							verified[connID] = false
+						}
 						connectTimer := jsGo.Math.Call("floor", jsGo.Math.Call("random").Float()*5001)
 						jsGo.SetTimeout(jsGo.SimpleProcOf(func() {
 							if roomID != connID && conns[connID].IsUndefined() {connect(connID)}
