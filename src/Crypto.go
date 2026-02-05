@@ -15,10 +15,16 @@ func generateSalt() (string) {
 	return salt.Call("toBase64").String()
 }
 
-// Hash the password and a salt together, returning a promise which will resolve to the hash
-func argon2(salt, password string) (promise js.Value) {
-	return jsGo.Get("argon2").Call("hash", map[string]any{
-		"pass": password,
-		"salt": jsGo.Uint8Array.Call("fromBase64", salt).String(),
-	})
+// Argon2 handler, which takes a salt, the password, and a callback to asynchonrously handle the returned hash
+func argon2(salt, password string, argon2Callback func(hash string)) {
+	jsGo.ThenableChain(
+		jsGo.Get("argon2").Call("hash", map[string]any{
+			"pass": password,
+			"salt": salt,
+		}),
+		func(hash js.Value) (any) {
+			argon2Callback(hash.Get("hashHex").String())
+			return nil
+		},
+	)
 }

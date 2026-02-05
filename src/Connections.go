@@ -46,29 +46,24 @@ func connectionHandler(conn js.Value, connID int, initiator, reconnect bool, sal
 
 					// Verify the response given by the receiver, and close if it is incorrect
 					case "response-challenge":
-						jsGo.ThenableChain(argon2(salt, password), func(hash js.Value) (any) {
-							hashStr := hash.Get("hashHex").String()
-							if metadata.Get("response").String() == hashStr {
+						argon2(salt, password, func(hash string) {
+							if metadata.Get("response").String() == hash {
 								verified[connID] = true
 
 								// Reply with the response to the receiver's challenge once the receiver has been verified (authenticated)
-								jsGo.ThenableChain(argon2(metadata.Get("challenge").String(), password), func(hash js.Value) (any) {
-									hashStr := hash.Get("hashHex").String()
+								argon2(metadata.Get("challenge").String(), password, func(hash string) {
 									conn.Call("send", map[string]any{"metadata": map[string]any{
 										"msg": "response",
-										"response": hashStr,
+										"response": hash,
 									}})
-									return nil
 								})
 							} else {conn.Call("close")}
-							return nil
 						})
 
 					// Verify the response given by the initiator, and close if it is incorrect
 					case "response":
-						jsGo.ThenableChain(argon2(salt, password), func(hash js.Value) (any) {
-							hashStr := hash.Get("hashHex").String()
-							if metadata.Get("response").String() == hashStr {
+						argon2(salt, password, func(hash string) {
+							if metadata.Get("response").String() == hash {
 								verified[connID] = true
 
 								// Sand name once the initiator has been verified
@@ -86,7 +81,6 @@ func connectionHandler(conn js.Value, connID int, initiator, reconnect bool, sal
 
 							// Close connection by default
 							} else {conn.Call("close")}
-							return nil
 						})
 
 					// Close connection by default
@@ -160,15 +154,13 @@ func connectionHandler(conn js.Value, connID int, initiator, reconnect bool, sal
 		// Trigger the receiver of the connection to reply with a response for the initial challenge, and also with their own challenge
 		if !verified[connID] && !initiator {
 			mySalt := generateSalt()
-			jsGo.ThenableChain(argon2(salt, password), func(hash js.Value) (any) {
-				hashStr := hash.Get("hashHex")
+			argon2(salt, password, func(hash string) {
 				conn.Call("send", map[string]any{"metadata": map[string]any{
 					"msg": "response-challenge",
-					"response": hashStr,
+					"response": hash,
 					"challenge": mySalt,
 				}})
 				salt = mySalt
-				return nil
 			})
 		}
 	}))
